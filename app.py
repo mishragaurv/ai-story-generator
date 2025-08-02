@@ -1,27 +1,21 @@
 import streamlit as st
-import openai
+from transformers import pipeline
 
-# Set API key
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+st.title("📝 Free AI Story Generator")
+st.write("Generate a short story from any idea — no API key needed!")
 
-st.title("📝 AI Story Generator")
-st.write("Generate a 3-paragraph story from any idea.")
+# Load the text generation pipeline
+@st.cache(allow_output_mutation=True)
+def load_generator():
+    return pipeline("text-generation", model="gpt2")
 
-# Get input from user
+generator = load_generator()
+
 prompt = st.text_input("Enter a story idea:", placeholder="A lonely robot on Mars...")
 
 if st.button("Generate Story") and prompt:
     with st.spinner("Writing your story..."):
-        try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You're a creative short story writer."},
-                    {"role": "user", "content": f"Write a 3-paragraph story about: {prompt}"}
-                ]
-            )
-            story = response.choices[0].message["content"]
-            st.markdown("### ✨ Generated Story:")
-            st.write(story)
-        except Exception as e:
-            st.error(f"Error: {e}")
+        results = generator(prompt, max_length=200, num_return_sequences=1)
+        story = results[0]['generated_text']
+        st.markdown("### ✨ Generated Story:")
+        st.write(story)

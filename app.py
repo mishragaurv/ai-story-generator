@@ -11,13 +11,13 @@ prompt = st.text_input("Enter a story idea:", placeholder="A lonely robot on Mar
 if st.button("Generate Story") and prompt:
     with st.spinner("Writing your story..."):
         try:
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": "You're a creative short story writer."},
-                    {"role": "user", "content": f"Write a 3-paragraph story about: {prompt}"}
-                ]
-            )
+            response = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "You're a creative short story writer."},
+        {"role": "user", "content": f"Write a 3-paragraph story about: {prompt}"}
+    ]
+)
             story = response['choices'][0]['message']['content']
             st.markdown("### ✨ Generated Story:")
             st.write(story)
